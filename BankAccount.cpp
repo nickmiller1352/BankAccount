@@ -1,9 +1,12 @@
-// Bank Account V1.cpp
+// Bank Account V2
 
-// Most basic use of this service.
-// Balance always starts at $0.
-// Allows the user to view balance, deposit, and withdraw.
-// Does not save ending balance for next use.
+// Allows a single user to save balance for next use.
+// Holds memory of balance in a text file.
+
+/*  - Create a .txt file named "balance" to hold user's balance.
+    - Write a function to write account balance to "balance".
+    - Write a function to read account balance from "balance".
+*/
 
 #include <iostream>
 #include <fstream>
@@ -11,8 +14,36 @@
 
 using namespace std;
 
-double balance, deposit, withdraw;
+double balance = 100, deposit, withdraw;
 int menuChoice;
+
+void saveBalance()
+{
+    ofstream balanceFile("balance.txt");
+    if (balanceFile.is_open())
+    {
+        balanceFile << balance;
+        balanceFile.close();
+    }
+    else
+        cout << "Unable to complete transaction.";
+}
+
+void readBalance()
+{
+    string accountBalance;
+    ifstream balanceFile("balance.txt");
+    if (balanceFile.is_open())
+    {
+        while (getline(balanceFile, accountBalance))
+        {
+            cout << accountBalance << endl;
+        }
+        balanceFile.close();
+    }
+    else
+        cout << "Unable to complete transaction.";
+}
 
 void displayMenu()
 {
@@ -34,7 +65,9 @@ int main()
         switch (menuChoice)
         {
         case 1:
-            cout << "Balance: $" << balance << '\n';
+            cout << "Balance: $";
+            readBalance();
+            cout << endl;
             break;
         case 2:
             cout << "How much would you like to deposit?\n"
@@ -42,6 +75,7 @@ int main()
             double deposit;
             cin >> deposit;
             balance = balance + deposit;
+            saveBalance();
             break;
         case 3:
             cout << "How much would you like to withdraw?\n"
@@ -56,6 +90,7 @@ int main()
             {
                 balance = balance - withdraw;
             }
+            saveBalance();
             break;
         default:
             cout << "Incorrect input.";
