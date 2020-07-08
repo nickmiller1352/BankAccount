@@ -1,4 +1,4 @@
-// Bank Account V2
+// Bank Account V2.3.cpp
 
 // Allows a single user to save balance for next use.
 // Holds memory of balance in a text file.
@@ -14,35 +14,74 @@
 
 using namespace std;
 
-double balance = 100, deposit, withdraw;
+double balance, deposit, withdraw;
+string account_balance;
+string::size_type sz;
 int menuChoice;
 
 void saveBalance()
 {
-    ofstream balanceFile("balance.txt");
-    if (balanceFile.is_open())
-    {
-        balanceFile << balance;
-        balanceFile.close();
-    }
-    else
-        cout << "Unable to complete transaction.";
+    ofstream balancefile;
+    balancefile.open("balance.txt");
+    balancefile << account_balance;
+    balancefile.close();
 }
 
 void readBalance()
 {
-    string accountBalance;
-    ifstream balanceFile("balance.txt");
-    if (balanceFile.is_open())
+    ifstream balancefile("balance.txt");
+    if (balancefile.is_open())
     {
-        while (getline(balanceFile, accountBalance))
+        while (getline(balancefile, account_balance))
         {
-            cout << accountBalance << endl;
+            balance = stod(account_balance, &sz);
         }
-        balanceFile.close();
+        balancefile.close();
     }
-    else
-        cout << "Unable to complete transaction.";
+}
+
+void printBalance()
+{
+    ifstream balancefile("balance.txt");
+    if (balancefile.is_open())
+    {
+        while (getline(balancefile, account_balance))
+        {
+            balance = stod(account_balance, &sz);
+            cout << "Balance: $" << balance << endl;
+        }
+        balancefile.close();
+    }
+}
+
+void makeDeposit()
+{
+    readBalance();
+
+    cout << "How much would you like to deposit?\n";
+    cout << "$";
+
+    cin >> deposit;
+    balance = balance + deposit;
+
+    account_balance = to_string(balance);
+
+    saveBalance();
+}
+
+void makeWithdrawal()
+{
+    readBalance();
+
+    cout << "How much would you like to withdraw?\n";
+    cout << "$";
+
+    cin >> withdraw;
+    balance = balance - withdraw;
+
+    account_balance = to_string(balance);
+
+    saveBalance();
 }
 
 void displayMenu()
@@ -65,35 +104,16 @@ int main()
         switch (menuChoice)
         {
         case 1:
-            cout << "Balance: $";
-            readBalance();
-            cout << endl;
+            printBalance();
             break;
         case 2:
-            cout << "How much would you like to deposit?\n"
-                 << "$";
-            double deposit;
-            cin >> deposit;
-            balance = balance + deposit;
-            saveBalance();
+            makeDeposit();
             break;
         case 3:
-            cout << "How much would you like to withdraw?\n"
-                 << "$";
-            double withdraw;
-            cin >> withdraw;
-            if (withdraw > balance)
-            {
-                cout << "Insufficient funds for withdrawal!\n";
-            }
-            else
-            {
-                balance = balance - withdraw;
-            }
-            saveBalance();
+            makeWithdrawal();
             break;
         default:
-            cout << "Incorrect input.";
+            cout << "Incorrect input.\n";
         }
         displayMenu();
     }
