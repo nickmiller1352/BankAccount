@@ -1,12 +1,7 @@
-// Bank Account V2.3.cpp
+// Bank Account V3
 
-// Allows a single user to save balance for next use.
-// Holds memory of balance in a text file.
-
-/*  - Create a .txt file named "balance" to hold user's balance.
-    - Write a function to write account balance to "balance".
-    - Write a function to read account balance from "balance".
-*/
+// Keeps track of every transaction within this account.
+// Allow user to print a statement showing transactions on account.
 
 #include <iostream>
 #include <fstream>
@@ -15,7 +10,7 @@
 using namespace std;
 
 double balance, deposit, withdraw;
-string account_balance;
+string account_balance, statement;
 string::size_type sz;
 int menuChoice;
 
@@ -25,6 +20,21 @@ void saveBalance()
     balancefile.open("balance.txt");
     balancefile << account_balance;
     balancefile.close();
+}
+
+void printStatement()
+{
+    ifstream statementfile("statement.txt");
+    if (statementfile.is_open())
+    {
+        while (getline(statementfile, statement))
+        {
+            cout << statement << endl;
+        }
+        statementfile.close();
+    }
+    else
+        cout << "Statement unavailable.";
 }
 
 void readBalance()
@@ -67,6 +77,12 @@ void makeDeposit()
     account_balance = to_string(balance);
 
     saveBalance();
+
+    ofstream statementfile;
+    statementfile.open("statement.txt", ios_base::app);
+    statementfile << '\n'
+                  << "Deposit made: $" << deposit << endl;
+    statementfile << "Balance: $" << account_balance;
 }
 
 void makeWithdrawal()
@@ -82,6 +98,12 @@ void makeWithdrawal()
     account_balance = to_string(balance);
 
     saveBalance();
+
+    ofstream statementfile;
+    statementfile.open("statement.txt", ios_base::app);
+    statementfile << '\n'
+                  << "Withdrawal made: $" << withdraw << endl;
+    statementfile << "Balance: $" << account_balance;
 }
 
 void displayMenu()
@@ -90,7 +112,8 @@ void displayMenu()
     cout << "1. View Account Balance\n";
     cout << "2. Deposit\n";
     cout << "3. Withdraw\n";
-    cout << "4. Exit\n";
+    cout << "4. Print Statement\n";
+    cout << "5. Exit\n";
 
     cin >> menuChoice;
 }
@@ -99,7 +122,7 @@ int main()
 {
     displayMenu();
 
-    while (menuChoice != 4)
+    while (menuChoice != 5)
     {
         switch (menuChoice)
         {
@@ -111,6 +134,9 @@ int main()
             break;
         case 3:
             makeWithdrawal();
+            break;
+        case 4:
+            printStatement();
             break;
         default:
             cout << "Incorrect input.\n";
